@@ -3,16 +3,16 @@ import { User } from "../model/user.model.js";
 import bcrypt from "bcrypt";
 import crypto from "node:crypto";
 const register = async (req, res) => {
-  const { username, password, name } = req.body;
+  const { username, password, name,email } = req.body;
 
-  if (!username || !password || !name) {
+  if (!username || !password || !name || !email) {
     return res.status(httpStatus.BAD_REQUEST).json({
       message: "All fields are required",
     });
   }
 
   try {
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(httpStatus.CONFLICT).json({
@@ -26,6 +26,7 @@ const register = async (req, res) => {
       username,
       name,
       password: hashedPassword,
+      email,
     });
 
     await newUser.save();
@@ -42,9 +43,9 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
+  const {email, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(httpStatus.BAD_REQUEST).json({
       message: "Please enter username & password",
     });
